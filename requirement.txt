@@ -59,3 +59,4 @@ MarkupSafe==3.0.2
 GitPython==3.1.44
 pydantic==2.11.7
 nvidia-nvtx-cu12==12.6.77
+scikit-image==0.21.0

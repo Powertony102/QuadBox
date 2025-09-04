@@ -21,6 +21,8 @@ from tqdm import tqdm
 from utils.image_utils import psnr
 from argparse import ArgumentParser, Namespace
 from arguments import ModelParams, PipelineParams, OptimizationParams
+from utils.importance_utils import precompute_importance
+
 try:
     from lpipsPyTorch import lpips
     LPIPS_AVAILABLE = True
@@ -79,6 +81,8 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
     viewpoint_stack = scene.getTrainCameras().copy()
     viewpoint_indices = list(range(len(viewpoint_stack)))
     ema_loss_for_log = 0.0
+    
+    precompute_importance(viewpoint_stack, viewpoint_indices)
 
     progress_bar = tqdm(range(first_iter, opt.iterations), desc="Training progress")
     first_iter += 1

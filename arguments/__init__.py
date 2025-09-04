@@ -99,6 +99,14 @@ class OptimizationParams(ParamGroup):
         self.optimizer_type = "default"
         super().__init__(parser, "Optimization Parameters")
 
+class ImportanceParams(ParamGroup):
+    def __init__(self, parser):
+        self.tile_size = 16
+        self.w_edge = 0.4
+        self.w_entropy = 0.3
+        self.w_glcm = 0.3
+        super().__init__(parser, "Importance Parameters")
+
 def get_combined_args(parser : ArgumentParser):
     cmdlne_string = sys.argv[1:]
     cfgfile_string = "Namespace()"
