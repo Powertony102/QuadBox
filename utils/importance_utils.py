@@ -10,11 +10,19 @@ class TileImportance():
     def __init__(self, viewpoint_stack, viewpoint_indices, importance_params=None):
         self.viewpoint_stack = viewpoint_stack
         self.viewpoint_indices = viewpoint_indices
-        self.tile_size = ImportanceParams.tile_size
-        # 混合复杂度分数的权重参数
-        self.w_edge = ImportanceParams.w_edge      # 边缘密度权重
-        self.w_entropy = ImportanceParams.w_entropy   # 香农熵权重
-        self.w_glcm = ImportanceParams.w_glcm      # GLCM对比度权重
+        
+        # 使用传入的参数或默认值
+        if importance_params is not None:
+            self.tile_size = importance_params.tile_size
+            self.w_edge = importance_params.w_edge
+            self.w_entropy = importance_params.w_entropy
+            self.w_glcm = importance_params.w_glcm
+        else:
+            # 使用默认参数值（与ImportanceParams中的默认值保持一致）
+            self.tile_size = 16
+            self.w_edge = 0.4      # 边缘密度权重
+            self.w_entropy = 0.3   # 香农熵权重
+            self.w_glcm = 0.3      # GLCM对比度权重
         
     def compute_importance(self):
         """
