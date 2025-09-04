@@ -1,5 +1,5 @@
 import math
-import torch
+import torch    
 import numpy as np
 import cv2
 from skimage.feature import graycomatrix, graycoprops
@@ -7,7 +7,7 @@ from skimage.measure import shannon_entropy
 from arguments import OptimizationParams, PipelineParams, ImportanceParams
 
 class TileImportance():
-    def __init__(self, viewpoint_stack, viewpoint_indices):
+    def __init__(self, viewpoint_stack, viewpoint_indices, importance_params=None):
         self.viewpoint_stack = viewpoint_stack
         self.viewpoint_indices = viewpoint_indices
         self.tile_size = ImportanceParams.tile_size
@@ -144,10 +144,15 @@ class TileImportance():
             return 0.0
 
 
-def precompute_importance(viewpoint_stack, viewpoint_indices):
+def precompute_importance(viewpoint_stack, viewpoint_indices, importance_params=None):
     """
     预计算所有视图中所有瓦块的重要性分数
     这个函数在训练开始前调用，用于一次性计算所有复杂度分数
+    
+    Args:
+        viewpoint_stack: 视角列表
+        viewpoint_indices: 视角索引列表
+        importance_params: 重要性计算参数，可选
     """
-    importance_calculator = TileImportance(viewpoint_stack, viewpoint_indices)
+    importance_calculator = TileImportance(viewpoint_stack, viewpoint_indices, importance_params)
     return importance_calculator.compute_importance()
