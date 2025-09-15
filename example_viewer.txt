@@ -1,0 +1,11 @@
+python fps_test.py \
+    --use-colmap \
+    --cameras-file ./viewer/counter/cameras.txt \
+    --images-file ./viewer/counter/images.txt \
+    --model ./eval/counter \
+    --frames 597 \
+    --width 1558 \
+    --height 1038 \
+    --output-dir ./viewer/counter \
+    --save-images \
+    --image-interval 20

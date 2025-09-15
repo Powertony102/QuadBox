@@ -16,6 +16,7 @@ from typing import List, Dict, Optional
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import torchvision
+from PIL import Image, ImageDraw, ImageFont
 
 # 添加项目根目录到路径
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -482,6 +483,85 @@ def init_scene(model_path: str, iteration: int = -1, skip_train_test_exp: bool =
     return gaussians, pipeline
 
 
+def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: int) -> torch.Tensor:
+    """
+    在图片上添加FPS信息覆盖层
+    
+    Args:
+        image_tensor: 渲染的图片tensor (C, H, W)
+        fps: FPS值
+        width: 图片宽度
+        height: 图片高度
+        
+    Returns:
+        添加了FPS信息的图片tensor
+    """
+    # 转换为PIL Image
+    if image_tensor.dim() == 3 and image_tensor.shape[0] == 3:
+        # (C, H, W) -> (H, W, C)
+        image_np = image_tensor.permute(1, 2, 0).cpu().numpy()
+    else:
+        image_np = image_tensor.cpu().numpy()
+    
+    # 确保值在[0, 1]范围内
+    image_np = np.clip(image_np, 0, 1)
+    # 转换为[0, 255]范围
+    image_np = (image_np * 255).astype(np.uint8)
+    
+    # 创建PIL Image
+    pil_image = Image.fromarray(image_np)
+    
+    # 创建绘图对象
+    draw = ImageDraw.Draw(pil_image)
+    
+    # 尝试加载系统字体，如果失败则使用默认字体
+    try:
+        # 尝试加载黑体字体
+        font = ImageFont.truetype("arial.ttf", 24)  # Windows系统
+    except:
+        try:
+            font = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", 24)  # macOS系统
+        except:
+            try:
+                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)  # Linux系统
+            except:
+                # 使用默认字体
+                font = ImageFont.load_default()
+    
+    # FPS文本
+    fps_text = f"FPS: {fps:.2f}"
+    
+    # 计算文本尺寸
+    bbox = draw.textbbox((0, 0), fps_text, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+    
+    # 设置覆盖层位置和大小
+    padding = 10
+    overlay_x = padding
+    overlay_y = padding
+    overlay_width = text_width + 2 * padding
+    overlay_height = text_height + 2 * padding
+    
+    # 创建半透明黑色背景
+    overlay = Image.new('RGBA', (overlay_width, overlay_height), (0, 0, 0, 153))  # 60%透明度的黑色
+    
+    # 将覆盖层粘贴到图片上
+    pil_image.paste(overlay, (overlay_x, overlay_y), overlay)
+    
+    # 在覆盖层上绘制白色文字
+    draw = ImageDraw.Draw(pil_image)
+    text_x = overlay_x + padding
+    text_y = overlay_y + padding
+    draw.text((text_x, text_y), fps_text, fill=(255, 255, 255, 255), font=font)
+    
+    # 转换回tensor
+    result_np = np.array(pil_image.convert('RGB'))
+    result_tensor = torch.from_numpy(result_np).float().permute(2, 0, 1) / 255.0
+    
+    return result_tensor
+
+
 def render_and_time(camera, gaussians, pipeline, 
                    n_frames: int = 100, background_color: List[float] = [0, 0, 0],
                    save_image: bool = False, save_path: str = None) -> float:
@@ -547,7 +627,13 @@ def render_and_time(camera, gaussians, pipeline,
             rendered_image = render(camera, gaussians, pipeline, background)["render"]
             # 确保图片在正确的范围内
             rendered_image = torch.clamp(rendered_image, 0.0, 1.0)
-            torchvision.utils.save_image(rendered_image, save_path)
+            
+            # 添加FPS覆盖层
+            width = camera.image_width
+            height = camera.image_height
+            rendered_image_with_fps = add_fps_overlay(rendered_image, fps, width, height)
+            
+            torchvision.utils.save_image(rendered_image_with_fps, save_path)
     
     return fps
 
