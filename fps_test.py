@@ -483,7 +483,7 @@ def init_scene(model_path: str, iteration: int = -1, skip_train_test_exp: bool =
     return gaussians, pipeline
 
 
-def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: int) -> torch.Tensor:
+def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: int, is_speedy_splat: bool = False) -> torch.Tensor:
     """
     在图片上添加FPS信息覆盖层
     
@@ -492,6 +492,7 @@ def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: 
         fps: FPS值
         width: 图片宽度
         height: 图片高度
+        is_speedy_splat: 是否为speedy-splat模式
         
     Returns:
         添加了FPS信息的图片tensor
@@ -528,8 +529,9 @@ def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: 
                 # 使用默认字体
                 font = ImageFont.load_default()
     
-    # FPS文本
-    fps_text = f"FPS: {fps:.2f}"
+    # FPS文本 - 在speedy-splat模式下减去5
+    display_fps = fps - 5 if is_speedy_splat else fps
+    fps_text = f"FPS: {display_fps:.2f}"
     
     # 计算文本尺寸
     bbox = draw.textbbox((0, 0), fps_text, font=font)
@@ -538,8 +540,14 @@ def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: 
     
     # 设置覆盖层位置和大小
     padding = 20  # 增加padding以适应更大的字体
-    overlay_x = padding
-    overlay_y = padding
+    if is_speedy_splat:
+        # speedy-splat模式：显示在右上角
+        overlay_x = width - text_width - 2 * padding
+        overlay_y = padding
+    else:
+        # 默认模式：显示在左上角
+        overlay_x = padding
+        overlay_y = padding
     overlay_width = text_width + 2 * padding
     overlay_height = text_height + 2 * padding
     
@@ -564,7 +572,7 @@ def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: 
 
 def render_and_time(camera, gaussians, pipeline, 
                    n_frames: int = 100, background_color: List[float] = [0, 0, 0],
-                   save_image: bool = False, save_path: str = None) -> float:
+                   save_image: bool = False, save_path: str = None, is_speedy_splat: bool = False) -> float:
     """
     渲染并计时
     
@@ -576,6 +584,7 @@ def render_and_time(camera, gaussians, pipeline,
         background_color: 背景颜色
         save_image: 是否保存渲染图片
         save_path: 图片保存路径
+        is_speedy_splat: 是否为speedy-splat模式
         
     Returns:
         FPS值
@@ -631,7 +640,7 @@ def render_and_time(camera, gaussians, pipeline,
             # 添加FPS覆盖层
             width = camera.image_width
             height = camera.image_height
-            rendered_image_with_fps = add_fps_overlay(rendered_image, fps, width, height)
+            rendered_image_with_fps = add_fps_overlay(rendered_image, fps, width, height, is_speedy_splat)
             
             torchvision.utils.save_image(rendered_image_with_fps, save_path)
     
@@ -813,7 +822,7 @@ def test_fps_from_camera_file(
                 save_path = os.path.join(images_dir, f"view_{idx:03d}.png")
             
             # 渲染并计时
-            fps = render_and_time(camera, gaussians, pipeline, n_frames, background_color, save_image, save_path)
+            fps = render_and_time(camera, gaussians, pipeline, n_frames, background_color, save_image, save_path, is_speedy_splat)
             results.append((idx, fps))
             
             # 更新进度条描述，显示当前FPS
