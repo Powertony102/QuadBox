@@ -517,13 +517,13 @@ def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: 
     # 尝试加载系统字体，如果失败则使用默认字体
     try:
         # 尝试加载黑体字体
-        font = ImageFont.truetype("arial.ttf", 24)  # Windows系统
+        font = ImageFont.truetype("arial.ttf", 48)  # Windows系统
     except:
         try:
-            font = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", 24)  # macOS系统
+            font = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", 48)  # macOS系统
         except:
             try:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)  # Linux系统
+                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 48)  # Linux系统
             except:
                 # 使用默认字体
                 font = ImageFont.load_default()
@@ -537,7 +537,7 @@ def add_fps_overlay(image_tensor: torch.Tensor, fps: float, width: int, height: 
     text_height = bbox[3] - bbox[1]
     
     # 设置覆盖层位置和大小
-    padding = 10
+    padding = 20  # 增加padding以适应更大的字体
     overlay_x = padding
     overlay_y = padding
     overlay_width = text_width + 2 * padding
