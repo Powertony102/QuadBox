@@ -5,7 +5,7 @@
   <a href="https://github.com/Powertony102/QuadGaussian"><img src="https://img.shields.io/badge/Project_Page-QuadBox-yellow" alt="Project Page"></a>
 </p>
 <p align="center">
-  <a href="https://xinzelicv.github.io/">Xinze Li</a><sup>1</sup>, Bohan Yang<sup>1</sup> Pengxu Chen<sup>1,2</sup>, Yiyuan Wang<sup>1,3</sup>, Hongcheng Luo <sup>4</sup>
+  <a href="https://xinzelicv.github.io/">Xinze Li</a><sup>1</sup>, Bohan Yang<sup>1</sup>, Pengxu Chen<sup>1,2</sup>, Yiyuan Wang<sup>1,3</sup>, Hongcheng Luo <sup>4</sup>
   Weifeng Su<sup>1,5</sup>,<a href="https://wtchengcv.github.io/">Wentao Cheng</a><sup>1†</sup>
 </p>
 <p align="center">
