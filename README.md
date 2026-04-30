@@ -85,3 +85,6 @@ python full_eval.py --mipnerf360 <path_to_mipnerf360> --tanksandtemples <path_to
 <p align="center">
 <img src="assets/quantative.png" alt="QuadBox Construction" width="90%">
 </p>
+
+## 🍺 Acknowledgements
+- Special thanks to our supervisor [Dr. Wentao Cheng](https://wtchengcv.github.io/) and [Prof. Weifeng Su](https://www.bnbu.edu.cn/en/faculty.htm#/wfsu/en) for consistent suggestions and efforts to this work.
