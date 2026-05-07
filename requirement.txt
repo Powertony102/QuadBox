@@ -1,0 +1,10 @@
+torch>=2.0.0
+numpy>=1.24.0
+opencv-python>=4.7.0
+pillow>=9.0.0
+scikit-image>=0.20.0
+tqdm>=4.60.0
+plyfile>=1.0.0
+PyYAML>=6.0
+wandb>=0.15.0
+triton>=2.0.0
